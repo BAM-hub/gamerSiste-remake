@@ -1,170 +1,119 @@
-import React, {
-  type Dispatch,
-  type SetStateAction,
-  useState,
-  useRef,
-} from "react";
+import React, { useState, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface TextInputProps {
   label?: string;
   id?: string;
   type: string;
-  // value: string | number;
   placeholder?: string;
-  // onChange: Dispatch<SetStateAction<number | string>>;
+  leftIcon?: React.ReactElement;
 }
 
 function TextInput(props: TextInputProps): React.ReactElement {
-  /**
-   * @todo split into two components
-   * the string in the input type number is an issue with fierfox
-   * use refs to handle the input type number tryout
-   */
   const [isNegativeNumber, setIsNegativeNumber] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  // if (process.env.NODE_ENV === "development") {
-  //   const schema = z
-  //     .object({
-  //       type: z.union([z.literal("text"), z.literal("number")]),
-  //       value: z.union([z.string(), z.number()]),
-  //     })
-  //     .superRefine((schema, ctx) => {
-  //       if (schema.type === "number" && typeof schema.value !== "number") {
-  //         const resolvedPath = [
-  //           `At input type ${props.type} with id ${
-  //             props.id || "no id was provided"
-  //           }`,
-  //         ];
-  //         const message = `input type ${props.type} must be assigned a value of type number`;
-  //         return ctx.addIssue({
-  //           code: z.ZodIssueCode.invalid_type,
-  //           expected: "number",
-  //           received: typeof schema.value,
-  //           path: ctx.path.length > 0 ? ctx.path : resolvedPath,
-  //           message,
-  //         });
-  //       }
-  //       if (schema.type === "text" && typeof schema.value !== "string") {
-  //         const message = `input type ${props.type} must be assigned a value of type string`;
-  //         const resolvedPath = [
-  //           `At input type ${props.type} with id ${
-  //             props.id || "no id was provided"
-  //           }`,
-  //         ];
-  //         return ctx.addIssue({
-  //           code: z.ZodIssueCode.invalid_type,
-  //           expected: "string",
-  //           received: typeof schema.value,
-  //           path: ctx.path.length > 0 ? ctx.path : resolvedPath,
-  //           message,
-  //         });
-  //       }
-  //     });
-  //   schema.parse({
-  //     type: props.type,
-  //     value: props.value,
-  //   });
-  // }
   const handleNumberChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const allowNegativeNumbers = true;
     try {
+      /**
+       * what i did here is not necessary
+       * wont do it in a real project
+       * just wanted to make all number inputs have the same behavior
+       * basically i am stoping any unwanted input then let the event handel the rest
+       */
       const currentVDomValue = event.currentTarget.value;
-      console.log(event.key);
       const isInputAllowed =
         event.key === "0" &&
         currentVDomValue.length === 1 &&
-        currentVDomValue === "0";
+        currentVDomValue === "0" &&
+        parseInt(event.key);
 
       if (isInputAllowed) {
         event.stopPropagation();
         event.preventDefault();
         return;
       }
+      const shouldDeleteNegativeSign =
+        isNegativeNumber &&
+        event.key === "Backspace" &&
+        currentVDomValue.length === 0;
 
-      if (event.key === "Backspace") {
-        debugger;
-        if (currentVDomValue.length === 0) {
-          if (isNegativeNumber) setIsNegativeNumber(false);
-          return;
-        }
-        if (inputRef.current) {
-          event.preventDefault();
-          event.stopPropagation();
-          inputRef.current.value = currentVDomValue.slice(0, -1);
-          return;
-        }
+      if (shouldDeleteNegativeSign) {
+        event.preventDefault();
+        event.stopPropagation();
+        setIsNegativeNumber(false);
+        return;
       }
-      if (currentVDomValue.length >= 15) return event.preventDefault();
 
-      if (
+      // let the browser handle deletion, selection, tab, arrow keys, etc
+      switch (event.key) {
+        case "ArrowLeft":
+        case "ArrowRight":
+        case "Tab":
+        case "Backspace":
+        case "Delete":
+        case event.ctrlKey && "a":
+          return;
+      }
+
+      // prevent the user from entering more than 15 characters for number precision
+      if (currentVDomValue.length >= 15) return event.preventDefault();
+      const shouldInsertNegativeSign =
         allowNegativeNumbers &&
         event.key === "-" &&
-        currentVDomValue.length === 0 &&
-        inputRef.current
-      ) {
+        currentVDomValue.length === 0;
+
+      if (shouldInsertNegativeSign) {
         setIsNegativeNumber(true);
         event.preventDefault();
         event.stopPropagation();
-        inputRef.current.value = "-";
         return;
       }
+
       const number = new Number(currentVDomValue + event.key).toFixed(0);
       if (!parseInt(number)) {
-        console.log("called", currentVDomValue + event.key);
         event.preventDefault();
         event.stopPropagation();
         return;
       }
-
-      event.preventDefault();
-      if (inputRef.current) inputRef.current.value += event.key;
     } catch (err) {
       console.log(err);
     }
   };
   return (
-    <div className="pd-1 flex gap-5 pb-2 pl-5 pr-5 pt-2 align-middle">
+    <div className="pd-1 flex h-16 items-center gap-5 pb-2 pl-5 pr-5 pt-2">
       {props?.label && (
         <label htmlFor={props.id}>
           <span className="text-white">{props.label}</span>
         </label>
       )}
-      <div className="relative">
-        <span
+      <div className="relative h-full">
+        <div
           className={twMerge(
             "",
-            isNegativeNumber &&
-              "before:absolute before:bottom-0 before:left-6 before:top-0 before:rounded-l  before:pb-1 before:pl-1 before:pr-1 before:pt-1 before:font-bold before:text-white before:content-['-']"
+            props.type === "number" &&
+              isNegativeNumber &&
+              "h-full before:absolute before:bottom-0 before:left-6 before:top-0 before:flex before:items-center before:rounded-l  before:pb-1 before:pl-1 before:pr-1 before:pt-1 before:font-bold before:text-white before:content-['-']",
+            props.leftIcon &&
+              "absolute bottom-0 left-6 top-1 flex h-5/6 items-center justify-center border-r-2 border-slate-600 pl-1 pr-2"
           )}
-        ></span>
+        >
+          {props.leftIcon}
+        </div>
       </div>
       <input
         id={props?.id}
         type={props.type}
-        // onSelect={(e) => console.log(e)}
         ref={inputRef}
-        onKeyDown={
-          handleNumberChange
-          //   props.type === "number"
-          //     ? handleNumberChange
-          //     : (e) => {
-          //         if (e.key === "Backspace")
-          //           return props.onChange((prevState) =>
-          //             (prevState as unknown as string).slice(0, -1)
-          //           );
-          //         if (e.key.length > 1) return e.preventDefault();
-          //         props.onChange(
-          //           (prevState) => (prevState as unknown as string) + e.key
-          //         );
-          //       }
-        }
-        // value={props.value}
+        onKeyDown={(e) => {
+          if (props.type === "number") handleNumberChange(e);
+        }}
         placeholder={props?.placeholder}
-        // value=""
         className={twMerge(
-          "h-8 w-80 rounded border-2 border-slate-400 bg-slate-800 pl-1 pr-1 text-white focus:outline-none active:border-slate-100",
-          isNegativeNumber && "pl-4"
+          "h-10 w-48 rounded bg-slate-800 pl-2 pr-2 text-white focus:outline-none active:border-slate-100",
+          props.type === "number" && isNegativeNumber && "pl-4",
+          props.type === "number" && "w-40",
+          props.leftIcon && "pl-10"
         )}
       />
     </div>

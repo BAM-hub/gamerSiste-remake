@@ -20,14 +20,18 @@ const Home: NextPage = () => {
             label="Age"
             id="age"
             type="number"
-            // value={age}
-            // onChange={setAge}
             placeholder="Age"
             key={1}
           />
-          <button type="submit">Submit</button>
+          <TextInput
+            label="user name"
+            id="user name"
+            type="text"
+            placeholder="user name"
+            leftIcon={<span className="text-white">@</span>}
+            key={1}
+          />
         </form>
-        <input type="number" name="" id="" />
       </main>
     </>
   );
