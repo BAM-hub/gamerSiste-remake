@@ -81,41 +81,42 @@ function TextInput(props: TextInputProps): React.ReactElement {
     }
   };
   return (
-    <div className="pd-1 flex h-16 items-center gap-5 pb-2 pl-5 pr-5 pt-2">
+    <div className="pd-1 flex flex-col items-center pb-2 pl-5 pr-5 pt-2 sm:flex-row ">
       {props?.label && (
-        <label htmlFor={props.id}>
+        <label htmlFor={props.id} className="w-full">
           <span className="text-white">{props.label}</span>
         </label>
       )}
-      <div className="relative h-full">
-        <div
-          className={twMerge(
-            "",
-            props.type === "number" &&
-              isNegativeNumber &&
-              "h-full before:absolute before:bottom-0 before:left-6 before:top-0 before:flex before:items-center before:rounded-l  before:pb-1 before:pl-1 before:pr-1 before:pt-1 before:font-bold before:text-white before:content-['-']",
-            props.leftIcon &&
-              "absolute bottom-0 left-6 top-1 flex h-5/6 items-center justify-center border-r-2 border-slate-600 pl-1 pr-2"
-          )}
-        >
-          {props.leftIcon}
+      <div className="flex h-full w-full">
+        <div className="relative h-full">
+          <div
+            className={twMerge(
+              "",
+              props.type === "number" &&
+                isNegativeNumber &&
+                "h-full before:absolute before:bottom-0 before:left-1 before:top-0 before:flex before:items-center before:rounded-l  before:pb-1 before:pl-1 before:pr-1 before:pt-1 before:font-bold before:text-white before:content-['-']",
+              props.leftIcon &&
+                "absolute bottom-0 left-1 top-1 flex h-5/6 items-center justify-center border-r-2 border-slate-600 pl-1 pr-2 "
+            )}
+          >
+            {props.leftIcon}
+          </div>
         </div>
+        <input
+          id={props?.id}
+          type={props.type}
+          ref={inputRef}
+          onKeyDown={(e) => {
+            if (props.type === "number") handleNumberChange(e);
+          }}
+          placeholder={props?.placeholder}
+          className={twMerge(
+            "h-10 w-48 rounded bg-slate-800 pl-2 pr-2 text-white focus:outline-none active:border-slate-100",
+            props.type === "number" && isNegativeNumber && "pl-4",
+            props.leftIcon && "pl-10"
+          )}
+        />
       </div>
-      <input
-        id={props?.id}
-        type={props.type}
-        ref={inputRef}
-        onKeyDown={(e) => {
-          if (props.type === "number") handleNumberChange(e);
-        }}
-        placeholder={props?.placeholder}
-        className={twMerge(
-          "h-10 w-48 rounded bg-slate-800 pl-2 pr-2 text-white focus:outline-none active:border-slate-100",
-          props.type === "number" && isNegativeNumber && "pl-4",
-          props.type === "number" && "w-40",
-          props.leftIcon && "pl-10"
-        )}
-      />
     </div>
   );
 }
