@@ -1,11 +1,12 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import { useState } from "react";
-import TextInput from "~/components/shared/TextInput";
+import Input from "~/components/shared/Input";
+import { api } from "~/utils/api";
+import { FaInstagram, FaFacebookF, FaTwitter } from "react-icons/fa6";
 
 const Home: NextPage = () => {
-  const [age, setAge] = useState(0);
-  const [name, setName] = useState("");
+  const { mutate: createProfile } = api.profile.createProfile.useMutation();
+
   return (
     <>
       <Head>
@@ -15,23 +16,50 @@ const Home: NextPage = () => {
       </Head>
       <main className="min-h-screen bg-slate-900">
         <h1 className="text-xl text-white">Create Profile</h1>
-        <form action="">
-          <TextInput
-            label="Age"
-            id="age"
-            type="number"
-            placeholder="Age"
-            key={1}
-          />
-          <TextInput
+        <form className="grid grid-cols-1 sm:grid-cols-2">
+          <Input label="Age" id="age" type="number" placeholder="Age" key={1} />
+          <Input
             label="user name"
             id="user name"
             type="text"
             placeholder="user name"
             leftIcon={<span className="text-white">@</span>}
-            key={1}
+            key={2}
+          />
+          <Input
+            label="twitter"
+            id="twitter"
+            type="text"
+            placeholder="jhon doe"
+            leftIcon={<FaTwitter className="text-white" />}
+            key={3}
+          />
+          <Input
+            label="facebook"
+            id="facebook"
+            type="text"
+            placeholder="jhon doe"
+            leftIcon={<FaFacebookF className="text-white" />}
+            key={4}
+          />
+          <Input
+            label="instagram"
+            id="instagram"
+            type="text"
+            placeholder="jhon doe"
+            leftIcon={<FaInstagram className="text-white" />}
+            key={5}
           />
         </form>
+        {/* <button
+          onClick={() =>
+            createProfile({
+              preferedConsole: Console.PS4,
+            })
+          }
+        >
+          button
+        </button> */}
       </main>
     </>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 
-interface TextInputProps {
+interface InputProps {
   label?: string;
   id?: string;
   type: string;
@@ -9,7 +9,7 @@ interface TextInputProps {
   leftIcon?: React.ReactElement;
 }
 
-function TextInput(props: TextInputProps): React.ReactElement {
+function Input(props: InputProps): React.ReactElement {
   const [isNegativeNumber, setIsNegativeNumber] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const handleNumberChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -121,4 +121,4 @@ function TextInput(props: TextInputProps): React.ReactElement {
   );
 }
 
-export default TextInput;
+export default Input;
