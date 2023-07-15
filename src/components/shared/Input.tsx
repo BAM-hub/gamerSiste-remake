@@ -1,17 +1,35 @@
-import React, { useState, useRef } from "react";
+import React, {
+  forwardRef,
+  useState,
+  useRef,
+  useImperativeHandle,
+} from "react";
 import { twMerge } from "tailwind-merge";
-
 interface InputProps {
   label?: string;
-  id?: string;
+  id: string;
   type: string;
   placeholder?: string;
   leftIcon?: React.ReactElement;
+  objectKey: string;
 }
 
-function Input(props: InputProps): React.ReactElement {
+const Input = forwardRef(function Input(
+  props: InputProps,
+  ref
+): React.ReactElement {
   const [isNegativeNumber, setIsNegativeNumber] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  useImperativeHandle(ref, () => {
+    return {
+      getValue: () => {
+        /**
+         * @todo add validation before returning the value
+         */
+        return { [props.objectKey]: inputRef.current?.value };
+      },
+    };
+  });
   const handleNumberChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const allowNegativeNumbers = true;
     try {
@@ -119,6 +137,8 @@ function Input(props: InputProps): React.ReactElement {
       </div>
     </div>
   );
-}
+});
+
+Input.displayName = "Input";
 
 export default Input;
